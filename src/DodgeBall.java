@@ -49,6 +49,13 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 		    addAnEnemy();
 		}
 		numTimes++;
+		for (GOval ball : balls) {
+			if (getElementAt(ball.getX() + ball.getWidth() + 1, ball.getY() + ball.getHeight() + 1) instanceof GRect) {
+				GObject enemy = getElementAt(ball.getX() + ball.getWidth() + 1, ball.getY() + ball.getHeight() + 1);
+				remove(enemy);
+				enemies.remove(enemy);
+			}
+		}
 	}
 	
 	public void mousePressed(MouseEvent e) {
