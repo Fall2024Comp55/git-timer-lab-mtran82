@@ -10,18 +10,32 @@ public class BallLauncher extends GraphicsProgram{
 	public static final int PROGRAM_WIDTH = 800;
 	public static final int SIZE = 25;
 	
+	private ArrayList<GOval> balls;
+	public static final int MS = 50;
+	public static final int SPEED = 2;
+	Timer timer = new Timer(MS, this);
+	
 	public void init() {
 		setSize(PROGRAM_WIDTH, PROGRAM_HEIGHT);
 		requestFocus();
 	}
 	
 	public void run() {
+		balls = new ArrayList<GOval>();
 		addMouseListeners();
+		timer.start();
 	}
 	
 	public void mousePressed(MouseEvent e) {
 		GOval ball = makeBall(SIZE/2, e.getY());
 		add(ball);
+		balls.add(ball);
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		for (GOval ball : balls) {
+			ball.move(SPEED, 0);
+		}
 	}
 	
 	public GOval makeBall(double x, double y) {
