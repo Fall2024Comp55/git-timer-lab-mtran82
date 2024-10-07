@@ -10,6 +10,7 @@ import acm.graphics.GLabel;
 import acm.graphics.GObject;
 import acm.graphics.GOval;
 import acm.graphics.GRect;
+import acm.graphics.GLine;
 import acm.program.GraphicsProgram;
 import acm.util.RandomGenerator;
 
@@ -19,15 +20,18 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 	private GLabel text;
 	private Timer movement;
 	private RandomGenerator rgen;
+	private GLine line;
+	private GLabel score;
 	
 	public static final int SIZE = 25;
 	public static final int SPEED = 2;
 	public static final int MS = 50;
 	public static final int MAX_ENEMIES = 10;
 	public static final int WINDOW_HEIGHT = 600;
-	public static final int WINDOW_WIDTH = 300;
+	public static final int WINDOW_WIDTH = 600;
 	
 	private int numTimes = -1;
+	private int enemyKilled = 0;
 	
 	public void run() {
 		rgen = RandomGenerator.getInstance();
@@ -37,12 +41,31 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 		text = new GLabel(""+enemies.size(), 0, WINDOW_HEIGHT);
 		add(text);
 		
+		line = new GLine(WINDOW_WIDTH / 2 + 1, 0, WINDOW_WIDTH / 2 + 1, WINDOW_HEIGHT);
+		line.setColor(Color.blue);
+		line.setLineWidth(2);
+		add(line);
+		
+		score = new GLabel("Enemy killed: " + enemyKilled, WINDOW_WIDTH * 3 / 4, WINDOW_HEIGHT / 2);
+		add(score);
+		
 		movement = new Timer(MS, this);
 		movement.start();
 		addMouseListeners();
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		if (enemies.size() >= MAX_ENEMIES) {
+			movement.stop();
+			for (GOval ball : balls) {
+				remove(ball);
+			}
+			for (GRect enemy : enemies) {
+				remove(enemy);
+			}
+			score.setLabel("You lost - Score: " + enemyKilled * 10);
+			score.setColor(Color.red);
+		}
 		moveAllBallsOnce();
 		moveAllEnemiesOnce();
 		if(numTimes % 40 == 0) {
@@ -54,6 +77,8 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 				GObject enemy = getElementAt(ball.getX() + ball.getWidth() + 1, ball.getY() + ball.getHeight() + 1);
 				remove(enemy);
 				enemies.remove(enemy);
+				enemyKilled++;
+				score.setLabel("Enemy Killed: " + enemyKilled);
 			}
 		}
 	}
@@ -88,7 +113,7 @@ public class DodgeBall extends GraphicsProgram implements ActionListener {
 	}
 	
 	public GRect makeEnemy(double y) {
-		GRect temp = new GRect(WINDOW_WIDTH-SIZE, y-SIZE/2, SIZE, SIZE);
+		GRect temp = new GRect((WINDOW_WIDTH / 2) -SIZE, y-SIZE/2, SIZE, SIZE);
 		temp.setColor(Color.GREEN);
 		temp.setFilled(true);
 		return temp;
